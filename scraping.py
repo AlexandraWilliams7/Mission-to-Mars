@@ -11,14 +11,15 @@ def scrape_all():
     browser = Browser('chrome', **executable_path, headless=True)
 
     news_title, news_paragraph = mars_news(browser)
-
+    hemisphere_image_urls = hemisphere_scrape(browser)
     # Run all scraping functions and store results in a dictionary.
     data = {
         "news_title": news_title,
         "news_paragraph": news_paragraph,
         "featured_image": featured_image(browser),
         "facts": mars_facts(),
-        "last_modified": dt.datetime.now()
+        "last_modified": dt.datetime.now(),
+        "hemispheres": hemisphere_image_urls
     }
 
     # Stop webdriver and return data.
@@ -101,6 +102,45 @@ def mars_facts():
 
     # Convert Dataframe into html, add Bootstrap
     return df.to_html()
+
+# Creating function for Hemisphere scrape.
+def hemisphere_scrape(browser):
+    # 1. Use browser to visit the URL 
+
+    url = 'https://astrogeology.usgs.gov/search/results?q=hemisphere+enhanced&k1=target&v1=Mars'
+
+    browser.visit(url)
+    browser.is_element_present_by_css("ul.item_list li.slide", wait_time=1)
+   
+    # 2. Create a list to hold the images and titles.
+    hemisphere_image_urls = []
+
+    # 3. Write code to retrieve the image urls and titles for each hemisphere.
+    html = browser.html
+    hemis_soup = soup(html, 'html.parser')
+
+    # Get the links for each of the 4 hemispheres
+    hemis_four = hemis_soup.find_all('h3')
+    # loop through each hemisphere link
+    for hemis in hemis_four:
+        #click the link of the hemisphere
+        img_page = browser.find_by_text(hemis.text)
+        img_page.click()
+        html= browser.html
+        img_soup = soup(html, 'html.parser')
+        # Scrape the image 
+        img_url = 'https://astrogeology.usgs.gov/' + str(img_soup.find('img', class_='wide-image')['src'])
+        # Scrape the title
+        title = img_soup.find('h2', class_='title').text
+        # Define Dictionary
+        hemispheres = {'img_url': img_url,'title': title}
+        # Append dictionary
+        hemisphere_image_urls.append(hemispheres)
+        # Return to beginning for next image
+        browser.back()
+    return hemisphere_image_urls
+
+# app name
 
 if __name__ == "__main__":
 
