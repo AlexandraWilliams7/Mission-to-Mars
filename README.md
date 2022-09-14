@@ -48,6 +48,7 @@ The Web App now has a new section for the Hemispheres.
 ![Deliv3 4](https://user-images.githubusercontent.com/105830665/190168231-f2eb03a1-f173-444e-938f-41fd41bf017a.png)
 
 There are 4 additional elements
+
       1. The color of the Jumbotron changed to orange.
       2. The Button is now activate.
       3. The Featured image is a thumdnail.
